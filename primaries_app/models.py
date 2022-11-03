@@ -8,19 +8,31 @@ from accounts.models import VoterProfile, CandidateProfile, User
 
 
 class MarkModel(models.Model):
-    """ A model for creating texts and marks for evaluating candidates"""
+    """A model for creating texts and marks for evaluating candidates"""
+
     content = RichTextField()
-    mark = models.SmallIntegerField(validators=[MinValueValidator(-2), MaxValueValidator(5)])
+    mark = models.SmallIntegerField(
+        validators=[MinValueValidator(-2), MaxValueValidator(5)]
+    )
 
     class Meta:
-        verbose_name = 'Voting Content'
+        verbose_name = "Voting Content"
 
 
 class EvaluateModel(models.Model):
-    """ Evaluating Candidates"""
-    voter = models.ForeignKey(VoterProfile, on_delete=models.CASCADE, related_name='voter', verbose_name='voter')
+    """Evaluating Candidates"""
+
+    voter = models.ForeignKey(
+        VoterProfile,
+        on_delete=models.CASCADE,
+        related_name="voter",
+        verbose_name="voter",
+    )
     candidate = models.ForeignKey(
-        CandidateProfile, on_delete=models.CASCADE, related_name='candidate', verbose_name='candidate'
+        CandidateProfile,
+        on_delete=models.CASCADE,
+        related_name="candidate",
+        verbose_name="candidate",
     )
     poll = models.ForeignKey(MarkModel, on_delete=models.CASCADE)
 
@@ -30,20 +42,23 @@ class EvaluateModel(models.Model):
         :return: if requested user not  candidate  raise error
         """
         if self.candidate.user not in User.objects.filter(is_candidate=True):
-            raise ValidationError('Can vote only for candidates')
+            raise ValidationError("Can vote only for candidates")
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super(EvaluateModel, self).save(*args, **kwargs)
 
     class Meta:
-        unique_together = ('voter', 'candidate',)
+        unique_together = (
+            "voter",
+            "candidate",
+        )
 
 
 class News(models.Model):
     title = models.CharField(max_length=1000)
     text = RichTextField(blank=True, null=True)
-    picture = models.ImageField(upload_to='media/news/', blank=True, null=True)
+    picture = models.ImageField(upload_to="media/news/", blank=True, null=True)
     media_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -51,11 +66,11 @@ class News(models.Model):
     def get_picture(self):
         return mark_safe(f'<img src={self.picture.url} width="90" height="70"')
 
-    get_picture.short_description = 'picture'
+    get_picture.short_description = "picture"
 
     def __str__(self):
         return self.title
 
     class Meta:
-        verbose_name = 'News'
-        verbose_name_plural = 'News'
+        verbose_name = "News"
+        verbose_name_plural = "News"

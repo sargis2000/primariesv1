@@ -10,21 +10,34 @@ class VotingAdmin(admin.ModelAdmin):
 
     @staticmethod
     def text(obj):
-        return strip_tags(obj.content)[:30] + '...'
+        return strip_tags(obj.content)[:30] + "..."
 
-    list_display = ('text', 'mark',)
-    search_fields = ('mark',)
+    list_display = (
+        "text",
+        "mark",
+    )
+    search_fields = ("mark",)
 
 
 @admin.register(EvaluateModel)
 class PollingAdmin(admin.ModelAdmin):
     """Evaluate model admin"""
-    list_display = ('voter', 'candidate',)
-    list_filter = ('voter', 'candidate',)
-    search_fields = ('voter', 'candidate',)
+
+    list_display = (
+        "voter",
+        "candidate",
+    )
+    list_filter = (
+        "voter",
+        "candidate",
+    )
+    search_fields = (
+        "voter",
+        "candidate",
+    )
 
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
-    search_fields = ('title', )
+    list_display = ("title", "created_at")
+    search_fields = ("title",)

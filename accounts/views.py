@@ -22,23 +22,34 @@ from django.views.decorators.csrf import csrf_protect, requires_csrf_token
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 __all__ = (
-    'GetCSRFToken', 'UserApiView', 'VoterProfileConfirmMail', 'VoterProfileAPIView', 'ActivateVoterProfileAPIView',
-    'CandidateProfileConfirmMail', 'CandidateProfileAPIview', 'ActivateCandidateProfileAPIView', 'CandidatePostAPIView',
-    'LoginAPIView', 'LogoutAPIView', 'FacebookLogin', 'SessionView')
+    "GetCSRFToken",
+    "UserApiView",
+    "VoterProfileConfirmMail",
+    "VoterProfileAPIView",
+    "ActivateVoterProfileAPIView",
+    "CandidateProfileConfirmMail",
+    "CandidateProfileAPIview",
+    "ActivateCandidateProfileAPIView",
+    "CandidatePostAPIView",
+    "LoginAPIView",
+    "LogoutAPIView",
+    "FacebookLogin",
+    "SessionView",
+)
 
 
 def csrf_failure(request, reason=""):
-    return Response({"message": "csrf missing  or incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {"message": "csrf missing  or incorrect"}, status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 def send_mailgun_mail(form: str, to: list, subject: str, message: str) -> Response:
     result = requests.post(
         "https://api.mailgun.net/v3/primaries.am/messages",
-        auth=('api', settings.EMAIL_HOST_PASSWORD),
-        data={"from": form,
-              "to": to,
-              "subject": subject,
-              "text": message})
+        auth=("api", settings.EMAIL_HOST_PASSWORD),
+        data={"from": form, "to": to, "subject": subject, "text": message},
+    )
     print(result)
     return result
 
@@ -48,11 +59,11 @@ def get_user(request):
     :param request: request object
     :return user, confirmation_token:
     """
-    user_id = request.GET.get('user_id', '')
-    confirmation_token = request.GET.get('confirmation_token', '')
+    user_id = request.GET.get("user_id", "")
+    confirmation_token = request.GET.get("confirmation_token", "")
     try:
         user = User.objects.get(pk=user_id)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     return user, confirmation_token
 
@@ -66,12 +77,12 @@ def create_confirmation_url(user: User, activation_url: str) -> str:
     :return confirm_url:
     """
     token = default_token_generator.make_token(user)
-    confirm_url = f'{activation_url}?user_id={user.id}&confirmation_token={token}'
+    confirm_url = f"{activation_url}?user_id={user.id}&confirmation_token={token}"
     return confirm_url
 
 
 class AnonThrottle(AnonRateThrottle):
-    rate = '1/s'
+    rate = "1/s"
 
     def parse_rate(self, rate):
         """rate parser"""
@@ -79,7 +90,7 @@ class AnonThrottle(AnonRateThrottle):
 
 
 class UserThrottle(UserRateThrottle):
-    rate = '1/s'
+    rate = "1/s"
 
     def parse_rate(self, rate):
         """rate parser"""
@@ -88,8 +99,9 @@ class UserThrottle(UserRateThrottle):
 
 class GetCSRFToken(APIView):
     """
-        A class which sets CSRF token cookie
+    A class which sets CSRF token cookie
     """
+
     permission_classes = [permissions.AllowAny]
 
     def get(self, request) -> Response:
@@ -98,7 +110,12 @@ class GetCSRFToken(APIView):
         :return Response:
         """
         x = get_token(request)
-        return Response({'success': 'CSRF cookie set', 'scrftoken': x}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"success": "CSRF cookie set", "scrftoken": x},
+            status=status.HTTP_201_CREATED,
+        )
+
+
 class SessionView(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -108,26 +125,32 @@ class SessionView(APIView):
         try:
             voter_profile = VoterProfile.objects.get(user=request.user)
         except VoterProfile.DoesNotExist:
-            voter_status = ''
+            voter_status = ""
         else:
             if voter_profile.user.is_voter:
-                voter_status = 'active'
+                voter_status = "active"
             else:
-                voter_status = 'pending'
+                voter_status = "pending"
         # check candidate
         try:
             candidate_profile = CandidateProfile.objects.get(user=request.user)
         except CandidateProfile.DoesNotExist:
-            candidate_status = ''
+            candidate_status = ""
         else:
             if candidate_profile.user.is_candidate:
-                candidate_status = 'active'
+                candidate_status = "active"
             else:
-                candidate_status = 'pending'
-        return Response({'isAuthenticated': True, 'voter_status': voter_status, ' candidate_status': candidate_status})
+                candidate_status = "pending"
+        return Response(
+            {
+                "isAuthenticated": True,
+                "voter_status": voter_status,
+                " candidate_status": candidate_status,
+            }
+        )
 
 
-@method_decorator(csrf_protect, 'post')
+@method_decorator(csrf_protect, "post")
 class UserApiView(APIView):
     authentication_classes = [SessionAuthentication]
     """A class which creates User object """
@@ -149,7 +172,8 @@ class UserApiView(APIView):
 
 
 class VoterProfileConfirmMail(APIView):
-    """ A class which send email when voter creates profile or requests new one"""
+    """A class which send email when voter creates profile or requests new one"""
+
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
@@ -162,22 +186,22 @@ class VoterProfileConfirmMail(APIView):
         :return Response: status 200 if success otherwise status 400
         """
         try:
-            send_mailgun_mail(form=settings.EMAIL_FROM,
-                              to=[request.user.voterprofile.email],
-                              subject='Confirmation mail',
-                              message="please click  below link to confirm voter profile. "
-                                      "If isn't it you, you can easy delete or ignor this mail\n" +
-                                      create_confirmation_url(
-                                          request.user,
-                                          activation_url=settings.VOTER_PROFILE_ACTIVATION_URL
-                                      ),
-                              )
+            send_mailgun_mail(
+                form=settings.EMAIL_FROM,
+                to=[request.user.voterprofile.email],
+                subject="Confirmation mail",
+                message="please click  below link to confirm voter profile. "
+                "If isn't it you, you can easy delete or ignor this mail\n"
+                + create_confirmation_url(
+                    request.user, activation_url=settings.VOTER_PROFILE_ACTIVATION_URL
+                ),
+            )
         except:
-            return Response('email not sent', status=status.HTTP_400_BAD_REQUEST)
-        return Response('email sent successful', status=status.HTTP_200_OK)
+            return Response("email not sent", status=status.HTTP_400_BAD_REQUEST)
+        return Response("email sent successful", status=status.HTTP_200_OK)
 
 
-@method_decorator(csrf_protect, 'post')
+@method_decorator(csrf_protect, "post")
 class VoterProfileAPIView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -200,7 +224,9 @@ class VoterProfileAPIView(APIView):
             serializer = VoterProfileSerializer(voter_profile)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except VoterProfile.DoesNotExist:
-            return Response('profile object does not exists', status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "profile object does not exists", status=status.HTTP_404_NOT_FOUND
+            )
 
     def post(self, request) -> Response:
         """
@@ -208,7 +234,7 @@ class VoterProfileAPIView(APIView):
         :param request: request object
         :return Response: serializer data if success otherwise serializer errors
         """
-        request.data['user'] = request.user.pk
+        request.data["user"] = request.user.pk
         serializer = VoterProfileSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -216,7 +242,11 @@ class VoterProfileAPIView(APIView):
                 sender = VoterProfileConfirmMail()
                 sender.get(request=request)
             except:
-                message = {['message']: "Email don't sent please request another confirmation email"}
+                message = {
+                    [
+                        "message"
+                    ]: "Email don't sent please request another confirmation email"
+                }
                 return Response(message, status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -233,8 +263,13 @@ class VoterProfileAPIView(APIView):
         try:
             instance = VoterProfile.objects.get(user=request.user)
         except VoterProfile.DoesNotExist:
-            return Response('Voter doe not exists firs of all create profile', status=status.HTTP_404_NOT_FOUND)
-        serializer = VoterProfileSerializer(data=request.data, instance=instance, partial=True)
+            return Response(
+                "Voter doe not exists firs of all create profile",
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = VoterProfileSerializer(
+            data=request.data, instance=instance, partial=True
+        )
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -243,8 +278,9 @@ class VoterProfileAPIView(APIView):
 
 class ActivateVoterProfileAPIView(APIView):
     """
-        A class which activates voter profile
+    A class which activates voter profile
     """
+
     authentication_classes = [SessionAuthentication]
 
     # throttle_classes = (AnonThrottle, UserThrottle,)
@@ -258,23 +294,32 @@ class ActivateVoterProfileAPIView(APIView):
         """
         user, confirmation_token = get_user(request)
         if user is None:
-            return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
         if user.voterprofile.is_email_verified is True:
-            return Response({'message': 'Voter profile already activated'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Voter profile already activated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if not default_token_generator.check_token(user, confirmation_token):
             return Response(
-                {'message': 'Token is invalid or expired. Please request another confirmation email by signing in.'},
-                status=status.HTTP_400_BAD_REQUEST)
+                {
+                    "message": "Token is invalid or expired. Please request another confirmation email by signing in."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user.voterprofile.is_email_verified = True
         user.is_voter = True
         user.save()
         user.voterprofile.save()
-        return Response({'message': 'Email successfully confirmed'}, status.HTTP_200_OK)
+        return Response({"message": "Email successfully confirmed"}, status.HTTP_200_OK)
 
 
 class CandidateProfileConfirmMail(APIView):
-    """A class which sent email for confirmation Candidate profile """
+    """A class which sent email for confirmation Candidate profile"""
+
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
@@ -282,23 +327,25 @@ class CandidateProfileConfirmMail(APIView):
 
     def get(self, request) -> Response:
         try:
-            send_mailgun_mail(form=settings.EMAIL_FROM,
-                              to=[request.user.candidateprofile.email],
-                              subject='Confirmation mail',
-                              message="please click  below link to confirm candidate profile "
-                                      "and wait till admin accept your profile.\n "
-                                      "If isn't it you, you can easy delete or ignor this mail\n" +
-                                      create_confirmation_url(
-                                          request.user, activation_url=settings.CANDIDATE_PROFILE_ACTIVATION_URL
-                                      ),
-                              )
+            send_mailgun_mail(
+                form=settings.EMAIL_FROM,
+                to=[request.user.candidateprofile.email],
+                subject="Confirmation mail",
+                message="please click  below link to confirm candidate profile "
+                "and wait till admin accept your profile.\n "
+                "If isn't it you, you can easy delete or ignor this mail\n"
+                + create_confirmation_url(
+                    request.user,
+                    activation_url=settings.CANDIDATE_PROFILE_ACTIVATION_URL,
+                ),
+            )
         except:
-            return Response('email not sent')
-        return Response('email sent successful')
+            return Response("email not sent")
+        return Response("email sent successful")
 
 
 # @method_decorator(csrf_protect, 'post')
-@method_decorator(csrf_protect, 'put')
+@method_decorator(csrf_protect, "put")
 class CandidateProfileAPIview(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, VoterPermission]
@@ -312,7 +359,7 @@ class CandidateProfileAPIview(APIView):
         try:
             profile = CandidateProfile.objects.get(user=request.user)
         except CandidateProfile.DoesNotExist:
-            return Response('User does not exist', status=status.HTTP_404_NOT_FOUND)
+            return Response("User does not exist", status=status.HTTP_404_NOT_FOUND)
         serializer = CandidateProfileSerializer(instance=profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -322,7 +369,7 @@ class CandidateProfileAPIview(APIView):
         :param request:
         :return: serializer data if success otherwise serializer errors
         """
-        request.data['user'] = request.user.pk
+        request.data["user"] = request.user.pk
         serializer = CandidateProfileSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -330,7 +377,11 @@ class CandidateProfileAPIview(APIView):
                 sender = CandidateProfileConfirmMail()
                 sender.get(request=request)
             except:
-                message = {['message']: "Email don't sent please request another confirmation email"}
+                message = {
+                    [
+                        "message"
+                    ]: "Email don't sent please request another confirmation email"
+                }
                 return Response(message, status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         print(serializer.data)
@@ -348,8 +399,13 @@ class CandidateProfileAPIview(APIView):
 
             instance = CandidateProfile.objects.get(user=request.user)
         except VoterProfile.DoesNotExist:
-            return Response('Candidate does not exists firs of all create profile', status=status.HTTP_404_NOT_FOUND)
-        serializer = CandidateProfileSerializer(data=request.data, instance=instance, partial=True)
+            return Response(
+                "Candidate does not exists firs of all create profile",
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = CandidateProfileSerializer(
+            data=request.data, instance=instance, partial=True
+        )
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -358,8 +414,9 @@ class CandidateProfileAPIview(APIView):
 
 class ActivateCandidateProfileAPIView(APIView):
     """
-        class which activates candidate profile
+    class which activates candidate profile
     """
+
     authentication_classes = [SessionAuthentication]
 
     # throttle_classes = (AnonThrottle, UserThrottle,)
@@ -374,32 +431,42 @@ class ActivateCandidateProfileAPIView(APIView):
 
         user, confirmation_token = get_user(request)
         if user is None:
-            return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
         if user.candidateprofile.is_email_verified is True:
-            return Response({'message': 'Candidate profile already activated'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Candidate profile already activated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if not default_token_generator.check_token(user, confirmation_token):
             return Response(
-                {'message': 'Token is invalid or expired. Please request another confirmation email by signing in.'},
-                status=status.HTTP_400_BAD_REQUEST)
+                {
+                    "message": "Token is invalid or expired. Please request another confirmation email by signing in."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user.candidateprofile.is_email_verified = True
         print(user.candidateprofile.is_email_verified)
         user.candidateprofile.save()
         try:
-            send_mail(subject='Candidate verified email',
-                      message=f"pls check Candidate profiles. {request.user} created profile and verified email",
-                      from_email=settings.EMAIL_FROM,
-                      recipient_list=(settings.ADMIN_EMAIL,)
-                      )
+            send_mail(
+                subject="Candidate verified email",
+                message=f"pls check Candidate profiles. {request.user} created profile and verified email",
+                from_email=settings.EMAIL_FROM,
+                recipient_list=(settings.ADMIN_EMAIL,),
+            )
         except:
-            return Response('Raised error')
-        return Response({'message': 'Email successfully confirmed'}, status.HTTP_200_OK)
+            return Response("Raised error")
+        return Response({"message": "Email successfully confirmed"}, status.HTTP_200_OK)
 
 
-@method_decorator(csrf_protect, 'post')
-@method_decorator(csrf_protect, 'put')
+@method_decorator(csrf_protect, "post")
+@method_decorator(csrf_protect, "put")
 class CandidatePostAPIView(APIView):
     """A class which creates and updates candidate posts"""
+
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, CandidatePermission]
 
@@ -415,7 +482,7 @@ class CandidatePostAPIView(APIView):
         :param request: request object
         :return: serializer data if success otherwise serializer errors
         """
-        request.data['profile'] = request.user.candidateprofile.pk
+        request.data["profile"] = request.user.candidateprofile.pk
         serializer = CandidatePostSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -433,15 +500,20 @@ class CandidatePostAPIView(APIView):
         try:
             instance = CandidatePost.objects.get(user=request.user)
         except VoterProfile.DoesNotExist:
-            return Response('Post does not exists firs of all create profile', status=status.HTTP_404_NOT_FOUND)
-        serializer = CandidatePostSerializer(data=request.data, instance=instance, partial=True)
+            return Response(
+                "Post does not exists firs of all create profile",
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = CandidatePostSerializer(
+            data=request.data, instance=instance, partial=True
+        )
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@method_decorator(csrf_protect, 'post')
+@method_decorator(csrf_protect, "post")
 class LoginAPIView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = (permissions.AllowAny,)
@@ -451,7 +523,7 @@ class LoginAPIView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = serializer.validated_data['user']
+            user = serializer.validated_data["user"]
             login(request, user)
             return Response(user.username, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -462,11 +534,12 @@ class LogoutAPIView(APIView):
 
     def get(self, request):
         logout(request)
-        return Response('user logout', status=status.HTTP_200_OK)
+        return Response("user logout", status=status.HTTP_200_OK)
 
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
+
 
 # sax candidatnery
 # candidati profile by id

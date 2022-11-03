@@ -20,12 +20,12 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 
-admin.site.site_title = 'Primaries admin'
-admin.site.site_header = 'Primaries administration'
-admin.site.index_title = 'Primaries administration'
+admin.site.site_title = "Primaries admin"
+admin.site.site_header = "Primaries administration"
+admin.site.index_title = "Primaries administration"
 urlpatterns = [
-    path('', include('primaries_app.urls')),
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('accounts.urls')),
+    path("", include("primaries_app.urls")),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("accounts.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-# urlpatterns += staticfiles_urlpatterns()
+
