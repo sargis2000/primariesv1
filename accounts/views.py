@@ -145,7 +145,7 @@ class SessionView(APIView):
             {
                 "isAuthenticated": True,
                 "voter_status": voter_status,
-                " candidate_status": candidate_status,
+                "candidate_status": candidate_status,
             }
         )
 
@@ -539,8 +539,3 @@ class LogoutAPIView(APIView):
 
 class FacebookLogin(SocialLoginView):
     adapter_class = FacebookOAuth2Adapter
-
-
-# sax candidatnery
-# candidati profile by id
-# candidati poster by candidate id

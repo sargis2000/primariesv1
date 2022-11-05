@@ -143,7 +143,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    # "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 10,
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -172,7 +172,9 @@ AUTH_USER_MODEL = "accounts.User"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_REDIRECT_URL = "/"
 VOTER_PROFILE_ACTIVATION_URL = "https://primaries-front.herokuapp.com/confirm/voter/"
-CANDIDATE_PROFILE_ACTIVATION_URL = "https://primaries-front.herokuapp.com/confirm/candidate"
+CANDIDATE_PROFILE_ACTIVATION_URL = (
+    "https://primaries-front.herokuapp.com/confirm/candidate/"
+)
 
 # email settings
 EMAIL_HOST_PASSWORD = str(os.getenv("MAILGUN_KEY"))
