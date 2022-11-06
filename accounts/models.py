@@ -12,6 +12,20 @@ gender = (
     ("female", "female"),
 )
 
+region = (
+    ("Աջափնյակ", "Աջափնյակ"),
+    ("Ավան", "Ավան"),
+    ("Արաբկիր", "Արաբկիր"),
+    ("Դավթաշեն", "Դավթաշեն"),
+    ("Էրեբունի", "Էրեբունի"),
+    ("Կենտրոն", "Կենտրոն"),
+    ("Մալաթիա-Սեբաստիա", "Մալաթիա-Սեբաստիա"),
+    ("Նոր Նորք", "Նոր Նորք"),
+    ("Նուբարաշեն", "Նուբարաշեն"),
+    ("Շենգավիթ", "Շենգավիթ"),
+    ("Քանաքեռ-Զեյթուն", "Քանաքեռ-Զեյթուն"),
+)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, verbose_name="username", unique=True)
@@ -31,18 +45,29 @@ class CandidateProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, default=None)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    birthdate = models.DateField()
+    picture = models.ImageField(upload_to="profile_pictures")
+    gender = models.CharField(max_length=6, choices=gender)
+    email = models.EmailField()
+    phone_number = PhoneNumberField()
+    region = models.CharField(max_length=16, choices=region)
+    address = models.CharField(max_length=50, verbose_name="Address")
+    facebook_url = models.URLField(
+        max_length=300, verbose_name="Facebook URL", help_text="Facebook account url"
+    )
+    youtube_url = models.URLField(
+        max_length=300, verbose_name="Youtube URL", help_text="Youtube account url"
+    )
+    Additional_url = models.URLField(
+        max_length=300,
+        verbose_name="Additional URL",
+        help_text="Additional url",
+        null=True,
+        blank=True,
+    )
     party = models.CharField(
         max_length=200, help_text="Կուսակցություն", default="Անկուսակցական"
     )
-    picture = models.ImageField(upload_to="profile_pictures")
-    email = models.EmailField()
-    phone_number = PhoneNumberField()
-    birthdate = models.DateField()
-    address = models.CharField(max_length=50, verbose_name="Address")
-    soc_url = models.URLField(
-        max_length=300, verbose_name="URL", help_text="Social account url"
-    )
-    gender = models.CharField(max_length=6, choices=gender)
     education = RichTextField(null=True, blank=True)
     about = RichTextField(
         help_text="here you can write about yourself", null=True, blank=True
@@ -99,7 +124,6 @@ class CandidatePost(models.Model):
         CandidateProfile,
         on_delete=models.CASCADE,
         help_text="choice which profile to post",
-        null=True,
     )
     title = models.CharField(max_length=100)
     text = RichTextField()
