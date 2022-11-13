@@ -1,3 +1,5 @@
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialToken
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import display
@@ -5,10 +7,9 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from allauth.account.models import EmailAddress
-from allauth.socialaccount.models import SocialToken
 from rest_framework.authtoken.models import TokenProxy
-from .models import User, CandidateProfile, CandidatePost, VoterProfile
+
+from .models import CandidatePost, CandidateProfile, User, VoterProfile
 
 
 class UserCreationForm(forms.ModelForm):

@@ -1,22 +1,23 @@
 import requests
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
-from rest_framework import permissions, authentication
-from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
-from dj_rest_auth.registration.views import SocialLoginView
-from .models import VoterProfile, User, CandidateProfile, CandidatePost
-from .serializers import *
-from .utils import VoterPermission, CandidatePermission
 from django.views.decorators.csrf import csrf_protect
+from rest_framework import authentication, permissions, status
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from rest_framework.views import APIView
+
+from .models import CandidatePost, CandidateProfile, User, VoterProfile
+from .serializers import *
+from .utils import CandidatePermission, VoterPermission
+
 
 __all__ = (
     "GetCSRFToken",

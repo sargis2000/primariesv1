@@ -1,13 +1,16 @@
 import datetime
+
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.html import mark_safe
 from phonenumber_field.modelfields import PhoneNumberField
+
 from .managers import CustomUserManager
+
 
 gender = (
     ("male", "Իգական"),

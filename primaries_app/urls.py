@@ -1,5 +1,7 @@
 from django.urls import path
+
 from .views import *
+
 
 urlpatterns = [
     path("choice_list/", MarkCandidateAPIView.as_view(), name="choice_list"),

@@ -36,7 +36,3 @@ repos:
         - --profile black
         - --lines-after-imports 2
         - --top os,sys
-        - --trailing-comma
-        - --use-parentheses
-        - --remove-redundant-aliases
-        - --float-to-top

@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+
 import dj_database_url
 from dotenv import load_dotenv
+
 
 project_folder = os.path.expanduser("~/primaries")
 load_dotenv(os.path.join(project_folder, ".env"))

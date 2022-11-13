@@ -1,13 +1,15 @@
-from accounts.serializers import CandidateProfileSerializer, CandidatePostSerializer
-from accounts.utils import VoterPermission, CandidatePermission
 from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from accounts.models import CandidateProfile
+
+from accounts.models import CandidatePost, CandidateProfile
+from accounts.serializers import CandidatePostSerializer, CandidateProfileSerializer
+from accounts.utils import CandidatePermission, VoterPermission
+
 from .models import MarkModel, News
 from .serializers import *
-from accounts.models import CandidatePost
+
 
 __all__ = [
     "MarkCandidateAPIView",

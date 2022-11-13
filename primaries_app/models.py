@@ -1,10 +1,10 @@
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.safestring import mark_safe
 
-from accounts.models import VoterProfile, CandidateProfile, User
+from accounts.models import CandidateProfile, User, VoterProfile
 
 
 class MarkModel(models.Model):

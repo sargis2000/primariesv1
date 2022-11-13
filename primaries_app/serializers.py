@@ -1,6 +1,9 @@
 from rest_framework import serializers
+
 from accounts.models import User
-from .models import MarkModel, EvaluateModel, News, CandidateProfile
+
+from .models import CandidateProfile, EvaluateModel, MarkModel, News
+
 
 __all__ = [
     "MarkModelSerializer",

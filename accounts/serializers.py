@@ -2,7 +2,8 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
-from accounts.models import User, VoterProfile, CandidateProfile, CandidatePost
+from accounts.models import CandidatePost, CandidateProfile, User, VoterProfile
+
 
 __all__ = (
     "CreateUserSerializer",
