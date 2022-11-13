@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from accounts.models import CandidatePost, CandidateProfile
 from accounts.serializers import CandidatePostSerializer, CandidateProfileSerializer
 from accounts.utils import CandidatePermission, VoterPermission
-
+from accounts.views import AnonThrottle, UserThrottle
 from .models import MarkModel, News
 from .serializers import *
 
@@ -86,6 +86,7 @@ class NewsAPIView(APIView):
 
 class GetCandidateProfiles(APIView):
     permission_classes = (IsAuthenticated, VoterPermission)
+    throttle_classes = (AnonThrottle,UserThrottle )
 
     def get(self, request) -> Response:
         response = CandidateProfile.objects.filter(user__is_candidate=True)

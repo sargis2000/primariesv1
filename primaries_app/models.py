@@ -10,13 +10,15 @@ from accounts.models import CandidateProfile, User, VoterProfile
 class MarkModel(models.Model):
     """A model for creating texts and marks for evaluating candidates"""
 
-    content = RichTextField()
+    content = RichTextField(verbose_name="Տեքստ")
     mark = models.SmallIntegerField(
-        validators=[MinValueValidator(-2), MaxValueValidator(5)]
+        validators=[MinValueValidator(-2), MaxValueValidator(5)],
+        verbose_name="Գնահատական"
     )
 
     class Meta:
-        verbose_name = "Voting Content"
+        verbose_name = "Վստահություն հայտնելու Ընտրանք"
+        verbose_name_plural = "Վստահություն հայտնելու Ընտրանքներ"
 
 
 class EvaluateModel(models.Model):
@@ -26,15 +28,15 @@ class EvaluateModel(models.Model):
         VoterProfile,
         on_delete=models.CASCADE,
         related_name="voter",
-        verbose_name="voter",
+        verbose_name="Ընտրող",
     )
     candidate = models.ForeignKey(
         CandidateProfile,
         on_delete=models.CASCADE,
         related_name="candidate",
-        verbose_name="candidate",
+        verbose_name="Թեկնածու",
     )
-    poll = models.ForeignKey(MarkModel, on_delete=models.CASCADE)
+    poll = models.ForeignKey(MarkModel, on_delete=models.CASCADE, verbose_name="Ինչպես է գնահատել՞")
 
     def clean(self):
         """
@@ -53,15 +55,17 @@ class EvaluateModel(models.Model):
             "voter",
             "candidate",
         )
+        verbose_name = "Վստահություն Քվեարկում"
+        verbose_name_plural = "Վստահություն Քվեարկում"
 
 
 class News(models.Model):
-    title = models.CharField(max_length=1000)
-    text = RichTextField(blank=True, null=True)
-    picture = models.ImageField(upload_to="media/news/", blank=True, null=True)
-    media_url = models.URLField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=1000, verbose_name="Վերնագիր")
+    text = RichTextField(blank=True, null=True, verbose_name="Տեքստ")
+    picture = models.ImageField(upload_to="media/news/", blank=True, null=True, verbose_name="Նկար")
+    media_url = models.URLField(blank=True, null=True, verbose_name="Մեդյա հղում")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ստեղծվել է")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Փոփոխվել է")
 
     def get_picture(self):
         return mark_safe(f'<img src={self.picture.url} width="90" height="70"')
@@ -72,5 +76,5 @@ class News(models.Model):
         return self.title
 
     class Meta:
-        verbose_name = "News"
-        verbose_name_plural = "News"
+        verbose_name = "Նորություններ"
+        verbose_name_plural = "Նորություններ"

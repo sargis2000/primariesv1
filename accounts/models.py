@@ -77,8 +77,6 @@ class CandidateProfile(models.Model):
         max_length=300,
         verbose_name="Լրացուցիչ հղում",
         help_text="Additional url",
-        null=True,
-        blank=True,
     )
     party = models.CharField(
         max_length=200,
@@ -89,27 +87,19 @@ class CandidateProfile(models.Model):
     education = RichTextField(null=True, blank=True, verbose_name="Կրթություն")
     about = RichTextField(
         help_text="here you can write about yourself",
-        null=True,
-        blank=True,
         verbose_name="Իմ մասին",
     )
     marital_status = RichTextField(
         help_text="here you can  about candidate marital status",
         verbose_name="Ամուսնական կարգավիճակ",
-        null=True,
-        blank=True,
     )
     work_experience = RichTextField(
         help_text="About work experience",
         verbose_name="Աշխատանքային Փորձ",
-        null=True,
-        blank=True,
     )
     political_experience = RichTextField(
         help_text="Քաղաքական Փորձ",
         verbose_name="political experience",
-        null=True,
-        blank=True,
     )
 
     is_email_verified = models.BooleanField(

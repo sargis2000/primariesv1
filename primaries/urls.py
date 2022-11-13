@@ -21,9 +21,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
 
-admin.site.site_title = "Primaries admin"
-admin.site.site_header = "Primaries administration"
-admin.site.index_title = "Primaries administration"
+admin.site.site_title = "Նախընտրության Ադմինիստրացյա"
+admin.site.site_header = "Նախընտրության Ադմինիստրացյա"
+admin.site.index_title = "Նախընտրության Ադմինիստրացյա"
 urlpatterns = [
     path("", include("primaries_app.urls")),
     path("admin/", admin.site.urls),

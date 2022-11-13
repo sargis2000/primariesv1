@@ -159,7 +159,7 @@ class UserApiView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.AllowAny]
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def post(self, request) -> Response:
         """
@@ -180,7 +180,7 @@ class VoterProfileConfirmMail(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def get(self, request) -> Response:
         """
@@ -286,7 +286,7 @@ class ActivateVoterProfileAPIView(APIView):
 
     authentication_classes = [SessionAuthentication]
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def get(self, request, pk=None) -> Response:
         """
@@ -326,7 +326,7 @@ class CandidateProfileConfirmMail(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def get(self, request) -> Response:
         try:
@@ -422,7 +422,7 @@ class ActivateCandidateProfileAPIView(APIView):
 
     authentication_classes = [SessionAuthentication]
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def get(self, request, pk=None):
         """
@@ -519,7 +519,7 @@ class LoginAPIView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = (permissions.AllowAny,)
 
-    # throttle_classes = (AnonThrottle, UserThrottle,)
+    throttle_classes = (AnonThrottle, UserThrottle,)
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
