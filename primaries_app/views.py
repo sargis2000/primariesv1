@@ -86,7 +86,6 @@ class NewsAPIView(APIView):
 
 class GetCandidateProfiles(APIView):
     permission_classes = (IsAuthenticated, VoterPermission)
-    throttle_classes = (AnonThrottle,UserThrottle )
 
     def get(self, request) -> Response:
         response = CandidateProfile.objects.filter(user__is_candidate=True)
