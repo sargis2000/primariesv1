@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "ckeditor",
     "primaries_app.apps.PrimariesAppConfig",
     "accounts",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -149,7 +150,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-    'EXCEPTION_HANDLER': 'accounts.utils.custom_exception_handler'
+    "EXCEPTION_HANDLER": "accounts.utils.custom_exception_handler",
 }
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

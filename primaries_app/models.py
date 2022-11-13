@@ -13,7 +13,7 @@ class MarkModel(models.Model):
     content = RichTextField(verbose_name="Տեքստ")
     mark = models.SmallIntegerField(
         validators=[MinValueValidator(-2), MaxValueValidator(5)],
-        verbose_name="Գնահատական"
+        verbose_name="Գնահատական",
     )
 
     class Meta:
@@ -36,7 +36,9 @@ class EvaluateModel(models.Model):
         related_name="candidate",
         verbose_name="Թեկնածու",
     )
-    poll = models.ForeignKey(MarkModel, on_delete=models.CASCADE, verbose_name="Ինչպես է գնահատել՞")
+    poll = models.ForeignKey(
+        MarkModel, on_delete=models.CASCADE, verbose_name="Ինչպես է գնահատել՞"
+    )
 
     def clean(self):
         """
@@ -62,7 +64,9 @@ class EvaluateModel(models.Model):
 class News(models.Model):
     title = models.CharField(max_length=1000, verbose_name="Վերնագիր")
     text = RichTextField(blank=True, null=True, verbose_name="Տեքստ")
-    picture = models.ImageField(upload_to="media/news/", blank=True, null=True, verbose_name="Նկար")
+    picture = models.ImageField(
+        upload_to="media/news/", blank=True, null=True, verbose_name="Նկար"
+    )
     media_url = models.URLField(blank=True, null=True, verbose_name="Մեդյա հղում")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ստեղծվել է")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Փոփոխվել է")

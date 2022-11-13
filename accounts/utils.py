@@ -25,8 +25,9 @@ def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     if isinstance(exc, Throttled):  # check that a Throttled exception is raised
-        time = response.data['detail'].split()[6]
-        response.data['detail'] = f'Հարցումն ընդհատվել է : Հասանելի կլինի {time} վայրկյանից:'
+        time = response.data["detail"].split()[6]
+        response.data[
+            "detail"
+        ] = f"Հարցումն ընդհատվել է : Հասանելի կլինի {time} վայրկյանից:"
 
     return response
-
