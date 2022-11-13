@@ -1,7 +1,6 @@
 from rest_framework import permissions
 
 
-
 class CandidatePermission(permissions.BasePermission):
     """class which check candidate permission"""
 

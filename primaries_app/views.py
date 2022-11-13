@@ -24,7 +24,10 @@ class MarkCandidateAPIView(APIView):
         Return a list of all the Marking model objects.
     """
 
-    permission_classes = [permissions.IsAuthenticated, VoterPermission | CandidatePermission]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        VoterPermission | CandidatePermission,
+    ]
 
     def get(self, request) -> Response:
         """

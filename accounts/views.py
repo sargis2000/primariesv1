@@ -52,7 +52,8 @@ def send_mailgun_mail(form: str, to: list, subject: str, message: str) -> Respon
 
 
 def get_user(request):
-    """
+    """Getting Current user and the token.
+
     :param request: request object
     :return user, confirmation_token:
     """
@@ -111,7 +112,7 @@ class GetCSRFToken(APIView):
             {"success": "CSRF cookie set", "scrftoken": x},
             status=status.HTTP_201_CREATED,
         )
-        res.set_cookie(key='csrf-token', value=x)
+        res.set_cookie(key="csrf-token", value=x)
         return res
 
 
@@ -202,7 +203,7 @@ class VoterProfileConfirmMail(APIView):
         return Response("email sent successful", status=status.HTTP_200_OK)
 
 
-@method_decorator(csrf_protect, 'put')
+@method_decorator(csrf_protect, "put")
 @method_decorator(csrf_protect, "post")
 class VoterProfileAPIView(APIView):
     authentication_classes = [SessionAuthentication]
@@ -252,8 +253,6 @@ class VoterProfileAPIView(APIView):
                 return Response(message, status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
     def put(self, request, *args, **kwargs):
         """
@@ -347,7 +346,7 @@ class CandidateProfileConfirmMail(APIView):
         return Response("email sent successful")
 
 
-@method_decorator(csrf_protect, 'post')
+@method_decorator(csrf_protect, "post")
 @method_decorator(csrf_protect, "put")
 class CandidateProfileAPIview(APIView):
     authentication_classes = [SessionAuthentication]

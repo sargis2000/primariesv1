@@ -30,12 +30,14 @@ region = (
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=30, verbose_name="Օգտանուն", unique=True )
+    username = models.CharField(max_length=30, verbose_name="Օգտանուն", unique=True)
     is_staff = models.BooleanField(default=False, verbose_name="Անձնակազմ")
     is_active = models.BooleanField(default=True, verbose_name="Ակտիվ")
     is_voter = models.BooleanField(default=False, verbose_name="Ընտրող")
     is_candidate = models.BooleanField(default=False, verbose_name="Թեկածու")
-    date_joined = models.DateTimeField(default=timezone.now, verbose_name="Գրանցման Ժամանակը")
+    date_joined = models.DateTimeField(
+        default=timezone.now, verbose_name="Գրանցման Ժամանակը"
+    )
     USERNAME_FIELD = "username"
     objects = CustomUserManager()
 
@@ -43,8 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.get_username()
 
     class Meta:
-        verbose_name = 'Օգտատերեր'
-        verbose_name_plural = 'Օգտատերեր'
+        verbose_name = "Օգտատերեր"
+        verbose_name_plural = "Օգտատերեր"
 
 
 class CandidateProfile(models.Model):
@@ -62,7 +64,11 @@ class CandidateProfile(models.Model):
         max_length=300, verbose_name="Facebook Հղում", help_text="Facebook account url"
     )
     youtube_url = models.URLField(
-        max_length=300, verbose_name="YouTube Հղում", help_text="Youtube account url", null=True, blank=True
+        max_length=300,
+        verbose_name="YouTube Հղում",
+        help_text="Youtube account url",
+        null=True,
+        blank=True,
     )
     additional_url = models.URLField(
         max_length=300,
@@ -72,11 +78,17 @@ class CandidateProfile(models.Model):
         blank=True,
     )
     party = models.CharField(
-        max_length=200, help_text="Կուսակցություն", default="Անկուսակցական", verbose_name="Կուսակցություն"
+        max_length=200,
+        help_text="Կուսակցություն",
+        default="Անկուսակցական",
+        verbose_name="Կուսակցություն",
     )
     education = RichTextField(null=True, blank=True, verbose_name="Կրթություն")
     about = RichTextField(
-        help_text="here you can write about yourself", null=True, blank=True, verbose_name="Իմ մասին"
+        help_text="here you can write about yourself",
+        null=True,
+        blank=True,
+        verbose_name="Իմ մասին",
     )
     marital_status = RichTextField(
         help_text="here you can  about candidate marital status",
@@ -97,7 +109,9 @@ class CandidateProfile(models.Model):
         blank=True,
     )
 
-    is_email_verified = models.BooleanField(default=False, verbose_name="Էլ․ Հասցեն հատատված է" )
+    is_email_verified = models.BooleanField(
+        default=False, verbose_name="Էլ․ Հասցեն հատատված է"
+    )
     is_cleaned = False
 
     def get_picture(self):
@@ -106,33 +120,36 @@ class CandidateProfile(models.Model):
     get_picture.short_description = "picture"
 
     class Meta:
-        verbose_name = 'Թեկնածուների էջեր'
-        verbose_name_plural = 'Թեկնածուների էջեր'
+        verbose_name = "Թեկնածուների էջեր"
+        verbose_name_plural = "Թեկնածուների էջեր"
 
 
 class VoterProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Օգտատեր")
-    first_name = models.CharField(max_length=200, verbose_name='Անուն')
-    last_name = models.CharField(max_length=200, verbose_name='Ազգանուն')
+    first_name = models.CharField(max_length=200, verbose_name="Անուն")
+    last_name = models.CharField(max_length=200, verbose_name="Ազգանուն")
     email = models.EmailField(verbose_name="Էլ․ Հասցե")
     phone_number = PhoneNumberField(verbose_name="Հեռախոսահամար")
-    birthdate = models.DateField(default=datetime.date(1950, 1, 1), verbose_name="Ծննդյան օր")
-    address = models.CharField(max_length=100, verbose_name="Հասցե")
-    soc_url = models.URLField(
-        max_length=300, verbose_name="Սոցիալական կայքի հղում"
+    birthdate = models.DateField(
+        default=datetime.date(1950, 1, 1), verbose_name="Ծննդյան օր"
     )
-    is_email_verified = models.BooleanField(default=False, verbose_name="Էլ․ Հասցեն հատատված է")
+    address = models.CharField(max_length=100, verbose_name="Հասցե")
+    soc_url = models.URLField(max_length=300, verbose_name="Սոցիալական կայքի հղում")
+    is_email_verified = models.BooleanField(
+        default=False, verbose_name="Էլ․ Հասցեն հատատված է"
+    )
     is_paid = models.BooleanField(default=False, verbose_name="ՎՃարել է")
 
     def __str__(self):
         return self.user.username
 
     class Meta:
-        verbose_name = 'Ընտրողների էջեր'
-        verbose_name_plural = 'Ընտրողների էջեր'
+        verbose_name = "Ընտրողների էջեր"
+        verbose_name_plural = "Ընտրողների էջեր"
+
 
 @receiver(post_save, sender=VoterProfile)
-def pre_save_user(sender, instance, created,  **kwargs):
+def pre_save_user(sender, instance, created, **kwargs):
     user = instance.user
     if instance.is_email_verified is True and instance.is_paid is True:
         user.is_voter = True
@@ -146,18 +163,19 @@ class CandidatePost(models.Model):
         CandidateProfile,
         on_delete=models.CASCADE,
         help_text="choice which profile to post",
-        verbose_name='Թոկնածու'
+        verbose_name="Թոկնածու",
     )
     title = models.CharField(max_length=100, verbose_name="Վերնագիր")
     text = RichTextField("Տեքստ")
-    media_path = models.URLField(
-        max_length=300, verbose_name="Տեսահոլովակի հղում"
+    media_path = models.URLField(max_length=300, verbose_name="Տեսահոլովակի հղում")
+    photo = models.ImageField(
+        upload_to="media/candidate_post_images/", verbose_name="Նկար"
     )
-    photo = models.ImageField(upload_to="media/candidate_post_images/", verbose_name="Նկար")
     important = models.BooleanField(default=False, verbose_name="Կարևոր")
 
     class Meta:
-        verbose_name = 'Թեկնածուների Փոստեր'
-        verbose_name_plural = 'Թեկնածուների Փոստեր'
+        verbose_name = "Թեկնածուների Փոստեր"
+        verbose_name_plural = "Թեկնածուների Փոստեր"
+
     def __str__(self):
         return "post: {0}:   author:{1}".format(self.title, self.profile.user.username)
