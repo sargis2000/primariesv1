@@ -107,10 +107,12 @@ class GetCSRFToken(APIView):
         :return Response:
         """
         x = get_token(request)
-        return Response(
+        res = Response(
             {"success": "CSRF cookie set", "scrftoken": x},
             status=status.HTTP_201_CREATED,
         )
+        res.set_cookie(key='csrf-token', value=x)
+        return res
 
 
 class SessionView(APIView):
@@ -200,6 +202,7 @@ class VoterProfileConfirmMail(APIView):
         return Response("email sent successful", status=status.HTTP_200_OK)
 
 
+@method_decorator(csrf_protect, 'put')
 @method_decorator(csrf_protect, "post")
 class VoterProfileAPIView(APIView):
     authentication_classes = [SessionAuthentication]
@@ -250,7 +253,8 @@ class VoterProfileAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @method_decorator(csrf_protect)
+
+
     def put(self, request, *args, **kwargs):
         """
             updates Voter profile
@@ -343,11 +347,11 @@ class CandidateProfileConfirmMail(APIView):
         return Response("email sent successful")
 
 
-# @method_decorator(csrf_protect, 'post')
+@method_decorator(csrf_protect, 'post')
 @method_decorator(csrf_protect, "put")
 class CandidateProfileAPIview(APIView):
     authentication_classes = [SessionAuthentication]
-    permission_classes = [permissions.IsAuthenticated, VoterPermission]
+    permission_classes = [permissions.IsAuthenticated]
     """A class which creat, update and get profiles
     get: get profile list
     post: create profile
@@ -397,7 +401,7 @@ class CandidateProfileAPIview(APIView):
         try:
 
             instance = CandidateProfile.objects.get(user=request.user)
-        except VoterProfile.DoesNotExist:
+        except CandidateProfile.DoesNotExist:
             return Response(
                 "Candidate does not exists firs of all create profile",
                 status=status.HTTP_404_NOT_FOUND,
@@ -447,7 +451,6 @@ class ActivateCandidateProfileAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user.candidateprofile.is_email_verified = True
-        print(user.candidateprofile.is_email_verified)
         user.candidateprofile.save()
         try:
             send_mail(
@@ -474,7 +477,6 @@ class CandidatePostAPIView(APIView):
         serializer = CandidatePostSerializer(instance=posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @method_decorator(csrf_protect)
     def post(self, request):
         """
 

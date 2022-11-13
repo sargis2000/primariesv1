@@ -10,7 +10,6 @@ from allauth.socialaccount.models import SocialToken
 from rest_framework.authtoken.models import TokenProxy
 from .models import User, CandidateProfile, CandidatePost, VoterProfile
 
-
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. All the required
     fields are plus repeated password."""
@@ -139,7 +138,6 @@ class CandidateProfileAdmin(admin.ModelAdmin):
         "last_name",
         "party",
     )
-    readonly_fields = ("is_email_verified",)
 
 
 @admin.register(VoterProfile)
@@ -153,8 +151,7 @@ class VoterProfile(admin.ModelAdmin):
         "email",
         "phone_number",
     )
-    list_filter = ("is_email_verified",)
-    readonly_fields = ("is_email_verified",)
+    list_filter = ("is_email_verified", "is_paid")
 
 
 admin.site.unregister(Group)

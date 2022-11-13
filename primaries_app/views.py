@@ -1,4 +1,5 @@
 from accounts.serializers import CandidateProfileSerializer, CandidatePostSerializer
+from accounts.utils import VoterPermission, CandidatePermission
 from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,7 +24,7 @@ class MarkCandidateAPIView(APIView):
         Return a list of all the Marking model objects.
     """
 
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, VoterPermission | CandidatePermission]
 
     def get(self, request) -> Response:
         """
@@ -79,7 +80,7 @@ class NewsAPIView(APIView):
 
 
 class GetCandidateProfiles(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, VoterPermission)
 
     def get(self, request) -> Response:
         response = CandidateProfile.objects.filter(user__is_candidate=True)
@@ -88,7 +89,7 @@ class GetCandidateProfiles(APIView):
 
 
 class GetCandidateByID(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, VoterPermission)
 
     def get(self, request):
         try:

@@ -43,7 +43,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 class VoterProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = VoterProfile
-        exclude = ("is_email_verified",)
+        exclude = ("is_email_verified", "is_paid")
 
     def create(self, validated_data):
         voter_profile = VoterProfile(**validated_data)
