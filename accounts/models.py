@@ -1,6 +1,5 @@
 import datetime
-
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.db.models.signals import post_save, pre_save
@@ -11,10 +10,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from .managers import CustomUserManager
 
-
 gender = (
-    ("male", "Իգական"),
-    ("female", "Արական"),
+    ("male", "Արական"),
+    ("female", "Իգական"),
 )
 
 region = (
@@ -33,6 +31,8 @@ region = (
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """The User class inherits from AbstractBaseUser and PermissionsMixin"""
+
     username = models.CharField(max_length=30, verbose_name="Օգտանուն", unique=True)
     is_staff = models.BooleanField(default=False, verbose_name="Անձնակազմ")
     is_active = models.BooleanField(default=True, verbose_name="Ակտիվ")
@@ -45,6 +45,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
+        """
+        It returns a string representation of the object.
+        """
         return self.get_username()
 
     class Meta:
@@ -53,6 +56,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class CandidateProfile(models.Model):
+    """The CandidateProfile class is a model that inherits from the models.Model class"""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, default=None)
     first_name = models.CharField(max_length=100, verbose_name="Անուն")
     last_name = models.CharField(max_length=100, verbose_name="Ազգանուն")
@@ -77,6 +82,8 @@ class CandidateProfile(models.Model):
         max_length=300,
         verbose_name="Լրացուցիչ հղում",
         help_text="Additional url",
+        null=True,
+        blank=True,
     )
     party = models.CharField(
         max_length=200,
@@ -84,28 +91,33 @@ class CandidateProfile(models.Model):
         default="Անկուսակցական",
         verbose_name="Կուսակցություն",
     )
-    education = RichTextField(null=True, blank=True, verbose_name="Կրթություն")
-    about = RichTextField(
-        help_text="here you can write about yourself",
-        verbose_name="Իմ մասին",
+    education = RichTextUploadingField(verbose_name="Կրթություն")
+
+    work_experience = RichTextUploadingField(
+        verbose_name="Աշխատանքային գործունեություն",
     )
-    marital_status = RichTextField(
-        help_text="here you can  about candidate marital status",
-        verbose_name="Ամուսնական կարգավիճակ",
+    political_experience = RichTextUploadingField(
+        verbose_name="Քաղաքական գործունեություն",
     )
-    work_experience = RichTextField(
-        help_text="About work experience",
-        verbose_name="Աշխատանքային Փորձ",
+    marital_status = RichTextUploadingField(
+        verbose_name="Ընտանեկան կարգավիճակ",
     )
-    political_experience = RichTextField(
-        help_text="Քաղաքական Փորձ",
-        verbose_name="political experience",
+    political_opinion = RichTextUploadingField(
+        verbose_name="Ազգային-քաղաքական դիրքորոշումներ",
+    )
+    yerevan_rebuild = RichTextUploadingField(
+        verbose_name="Բարեփոխումներ մայրաքաղաքում",
     )
 
     is_email_verified = models.BooleanField(
         default=False, verbose_name="Էլ․ Հասցեն հատատված է"
     )
+
+    is_approved = models.BooleanField("Հաստատվել է Ադմինի կողմից։", default=False)
     is_cleaned = False
+
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
     def get_picture(self):
         return mark_safe(f'<img src={self.picture.url} width="90" height="70"')
@@ -118,6 +130,8 @@ class CandidateProfile(models.Model):
 
 
 class VoterProfile(models.Model):
+    """This class is a model for the VoterProfile table in the database"""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Օգտատեր")
     first_name = models.CharField(max_length=200, verbose_name="Անուն")
     last_name = models.CharField(max_length=200, verbose_name="Ազգանուն")
@@ -141,17 +155,9 @@ class VoterProfile(models.Model):
         verbose_name_plural = "Ընտրողների էջեր"
 
 
-@receiver(post_save, sender=VoterProfile)
-def pre_save_user(sender, instance, created, **kwargs):
-    user = instance.user
-    if instance.is_email_verified is True and instance.is_paid is True:
-        user.is_voter = True
-    else:
-        user.is_voter = False
-    user.save()
-
-
 class CandidatePost(models.Model):
+    """The CandidatePost class is a model that inherits from the models.Model class"""
+
     profile = models.ForeignKey(
         CandidateProfile,
         on_delete=models.CASCADE,
@@ -159,10 +165,10 @@ class CandidatePost(models.Model):
         verbose_name="Թոկնածու",
     )
     title = models.CharField(max_length=100, verbose_name="Վերնագիր")
-    text = RichTextField("Տեքստ")
+    text = RichTextUploadingField("Տեքստ")
     media_path = models.URLField(max_length=300, verbose_name="Տեսահոլովակի հղում")
     photo = models.ImageField(
-        upload_to="media/candidate_post_images/", verbose_name="Նկար"
+        upload_to="media/candidate_post_images/", verbose_name="Նկար", max_length=200
     )
     important = models.BooleanField(default=False, verbose_name="Կարևոր")
 
@@ -171,4 +177,44 @@ class CandidatePost(models.Model):
         verbose_name_plural = "Թեկնածուների Փոստեր"
 
     def __str__(self):
-        return "post: {0}:   author:{1}".format(self.title, self.profile.user.username)
+        """
+        It returns a string representation of the object.
+        """
+        return "Հրապարակում: {0}:  Հեղինակ:{1}".format(self.title, self.profile.user.username)
+
+
+@receiver(post_save, sender=VoterProfile)
+def post_save_user(sender, instance, created, **kwargs):
+    """
+    If the user is being created, set the password to the raw password, and then save the user
+
+    :param sender: The model class
+    :param instance: The User instance that is about to be saved
+    :param created: True if a new record is being created
+    """
+    if created is False:
+        user = instance.user
+        if instance.is_email_verified is True and instance.is_paid is True:
+            user.is_voter = True
+        else:
+            user.is_voter = False
+        user.save()
+
+
+@receiver(post_save, sender=CandidateProfile)
+def pre_save_profile(sender, instance, created, **kwargs) -> None:
+    """
+    If the user is being created, set the password to the raw password, and then save the user
+
+    :param sender: The model class
+    :param instance: The User instance that is about to be saved
+    :param created: True if a new record is being created
+    """
+    user = instance.user
+    # Checking if the candidate is approved by the admin.
+    if instance.is_approved:
+        user.is_candidate = True
+    else:
+        user.is_candidate = False
+    user.save()
+

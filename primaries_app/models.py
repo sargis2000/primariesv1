@@ -1,4 +1,4 @@
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -10,7 +10,7 @@ from accounts.models import CandidateProfile, User, VoterProfile
 class MarkModel(models.Model):
     """A model for creating texts and marks for evaluating candidates"""
 
-    content = RichTextField(verbose_name="Տեքստ")
+    content = RichTextUploadingField(verbose_name="Տեքստ")
     mark = models.SmallIntegerField(
         validators=[MinValueValidator(-2), MaxValueValidator(5)],
         verbose_name="Գնահատական",
@@ -63,7 +63,7 @@ class EvaluateModel(models.Model):
 
 class News(models.Model):
     title = models.CharField(max_length=1000, verbose_name="Վերնագիր")
-    text = RichTextField(blank=True, null=True, verbose_name="Տեքստ")
+    text = RichTextUploadingField(blank=True, null=True, verbose_name="Տեքստ")
     picture = models.ImageField(
         upload_to="media/news/", blank=True, null=True, verbose_name="Նկար"
     )

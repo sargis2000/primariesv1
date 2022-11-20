@@ -11,4 +11,5 @@ urlpatterns = [
         "candidate-profiles/", GetCandidateProfiles.as_view(), name="candidate_profiles"
     ),
     path("candidate-profile/", GetCandidateByID.as_view(), name="get_candidate"),
+    path("send_email/", SendMailAPIVIEW.as_view(), name="send_api_mail"),
 ]

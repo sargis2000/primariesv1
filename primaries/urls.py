@@ -35,15 +35,25 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
-admin.site.site_title = "Նախընտրության Ադմինիստրացյա"
-admin.site.site_header = "Նախընտրության Ադմինիստրացյա"
-admin.site.index_title = "Նախընտրության Ադմինիստրացյա"
+admin.site.site_title = "Նախընտրության Ադմինիստրացիա"
+admin.site.site_header = "Նախընտրության Ադմինիստրացիա"
+admin.site.index_title = "Նախընտրության Ադմինիստրացիա"
 urlpatterns = [
-                  re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
-                          name='schema-json'),
-                  re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-                  re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-                  path("", include("primaries_app.urls")),
-                  path("admin/", admin.site.urls),
-                  path("api-auth/", include("accounts.urls")),
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    re_path(
+        r"^swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    re_path(
+        r"^swagger/$",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    re_path(
+        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+    ),
+    path("", include("primaries_app.urls")),
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("accounts.urls")),
+    path("ckeditor/", include("ckeditor_uploader.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

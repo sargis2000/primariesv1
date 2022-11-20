@@ -58,13 +58,17 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "corsheaders",
     "ckeditor",
+    "ckeditor_uploader",
     "primaries_app.apps.PrimariesAppConfig",
     "accounts",
     "drf_yasg",
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -160,6 +164,7 @@ LANGUAGE_CODE = "hy"
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+DATE_INPUT_FORMATS = ["%d/%m/%Y"]
 
 USE_TZ = True
 # Static files (CSS, JavaScript, Images)
@@ -168,6 +173,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = "static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+CKEDITOR_UPLOAD_PATH = "ck-editor/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "dessjvuyq",
+    "API_KEY": "394724571544662",
+    "API_SECRET": "lMei4a54Iu1OStqym9rFjezK1Jo",
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 AUTH_USER_MODEL = "accounts.User"

@@ -7,9 +7,13 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect, render
+from django.template.response import TemplateResponse
+from django.urls import path
 from rest_framework.authtoken.models import TokenProxy
 
 from .models import CandidatePost, CandidateProfile, User, VoterProfile
+from .views import send_email_view
 
 
 class UserCreationForm(forms.ModelForm):
@@ -26,6 +30,10 @@ class UserCreationForm(forms.ModelForm):
         fields = ("username",)
 
     def clean_password2(self):
+        """
+        If the two passwords don't match, raise a validation error
+        :return: The password2 is being returned.
+        """
         # Check that the two password entries match
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
@@ -34,7 +42,13 @@ class UserCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        # Save the provided password in hashed format
+        """
+        The function takes the password from the form, hashes it, and saves it to the database
+
+        :param commit: A boolean that tells Django whether to save the User object after the form is validated, defaults to
+        True (optional)
+        :return: The user object is being returned.
+        """
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
@@ -58,14 +72,26 @@ class UserChangeForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     def make_inactive(self, request, queryset):
+        """
+        It takes a queryset of objects, and sets the is_active field to False
+
+        :param request: The current request
+        :param queryset: The queryset of objects to be acted upon
+        """
         queryset.update(is_active=False)
 
-    make_inactive.short_description = "Set inactive to selected  users"
+    make_inactive.short_description = "Ապակտիվացնել նշված օգտատերերին"
 
     def make_active(self, request, queryset):
+        """
+        It takes a queryset of objects, and updates the is_active field to True
+
+        :param request: The current request
+        :param queryset: The queryset of objects to be acted upon
+        """
         queryset.update(is_active=True)
 
-    make_active.short_description = "Set active to selected  users"
+    make_active.short_description = "Ակտիվացնել նշված օգտատերերին"
 
     form = UserChangeForm
     add_form = UserCreationForm
@@ -97,7 +123,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ("username",)
     list_filter = ("is_voter", "is_candidate", "is_active")
     list_display = ("username", "is_voter", "is_candidate", "is_active")
-    readonly_fields = ("date_joined",)
+    readonly_fields = ("date_joined", "is_candidate", "is_voter")
     actions = (
         "make_inactive",
         "make_active",
@@ -108,20 +134,52 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(CandidatePost)
 class PostAdmin(admin.ModelAdmin):
     model = CandidatePost
-    list_display = ("title", "text", "get_user")
+    list_display = ("get_user", "title")
     list_filter = ("profile",)
     search_fields = ("title",)
 
     @display(ordering="profile__user", description="user")
     def get_user(self, obj):
+        """
+        The function takes in an object (obj) and returns the username of the user who created the object
+
+        :param obj: The object that is being serialized
+        :return: The username of the user who created the post.
+        """
         user = obj.profile.user
         return user.username
 
 
 @admin.register(CandidateProfile)
 class CandidateProfileAdmin(admin.ModelAdmin):
+    def send_mail_action(self, request, queryset):
+        """
+        It takes a queryset of objects, and sends an email to each object's email address
+
+        :param request: The request object
+        :param queryset: The queryset of objects that are selected
+        """
+
+        return TemplateResponse(request, "send_mail.html", context={"emails": queryset.values_list("email", flat=True)})
+
+    send_mail_action.short_description = "Ուղղարկել նամակ Նշված  թեկնածուներին"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('send_email_view/', self.admin_site.admin_view(send_email_view, cacheable=True),
+                 name="send_mail_splash"),
+        ]
+        return my_urls + urls
+
     @staticmethod
     def full_name(obj):
+        """
+        It returns a string that is the username of the user associated with the profile, followed by the string " profile"
+
+        :param obj: The object that the model is attached to
+        :return: The full name of the user.
+        """
         return "{0} profile".format(obj.user.username)
 
     list_display = (
@@ -140,10 +198,33 @@ class CandidateProfileAdmin(admin.ModelAdmin):
         "last_name",
         "party",
     )
+    actions = (
+        "send_mail_action",
+        "delete_selected"
+    )
 
 
 @admin.register(VoterProfile)
 class VoterProfile(admin.ModelAdmin):
+    def send_mail_action(self, request, queryset):
+        """
+        It takes a queryset of objects, and sends an email to each object's email address
+
+        :param request: The request object
+        :param queryset: The queryset of objects that are selected
+        """
+
+        return TemplateResponse(request, "send_mail.html", context={"emails": queryset.values_list("email", flat=True)})
+
+    send_mail_action.short_description = "Ուղղարկել նամակ Նշված  ընտրողներին։"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            path('send_email_view/', self.admin_site.admin_view(send_email_view, cacheable=True),
+                 name="send_mail_splash"),
+        ]
+        return my_urls + urls
     @staticmethod
     def full_name(obj):
         return "{0} profile".format(obj.user.username)
