@@ -34,6 +34,7 @@ __all__ = (
     "LogoutAPIView",
     "FacebookLogin",
     "SessionView",
+    "GetVoterProfiles"
 )
 
 
@@ -660,8 +661,9 @@ def send_email_view(request):
     if request.method == "POST":
         data = request.POST
         message = data["message"]
-        mails = data["mails"]
+        mails = data.getlist('mails')
         subject = data["subject"]
+
         res = send_mailgun_mail(
             form=settings.EMAIL_FROM,
             to=mails,
@@ -672,5 +674,14 @@ def send_email_view(request):
             messages.add_message(request, messages.INFO, "էլ․ Հաղորդագրությունները ուղարկված է։")
             return redirect('admin:index')
         else:
-            messages.add_message(request, messages.INFO, "էլ․ Հաղորդագրությունները չի ուղարկվել։")
+            messages.add_message(request, messages.WARNING, "էլ․ Հաղորդագրությունները չի ուղարկվել։")
             return redirect('admin:index')
+
+
+class GetVoterProfiles(APIView):
+    def get(self, request, *args, **kwargs):
+        voters = VoterProfile.objects.all().filter(user__is_voter=True)
+        serializer = VoterProfileSerializer(instance=voters, many=True)
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

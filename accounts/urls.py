@@ -39,4 +39,5 @@ urlpatterns = [
     path("login/", LoginAPIView.as_view(), name="login"),
     path("logout/", LogoutAPIView.as_view(), name="logout"),
     path("facebook/", FacebookLogin.as_view(), name="fb_login"),
+    path("get-voter-profiles/", GetVoterProfiles.as_view(), name="get-voter-profiles")
 ]

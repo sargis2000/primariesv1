@@ -10,7 +10,7 @@ from accounts.models import CandidateProfile, User, VoterProfile
 class MarkModel(models.Model):
     """A model for creating texts and marks for evaluating candidates"""
 
-    content = RichTextUploadingField(verbose_name="Տեքստ")
+    content = models.CharField(max_length=2000, verbose_name="Տեքստ")
     mark = models.SmallIntegerField(
         validators=[MinValueValidator(-2), MaxValueValidator(5)],
         verbose_name="Գնահատական",
@@ -20,6 +20,8 @@ class MarkModel(models.Model):
         verbose_name = "Վստահություն հայտնելու Ընտրանք"
         verbose_name_plural = "Վստահություն հայտնելու Ընտրանքներ"
 
+    def __str__(self):
+        return self.content[:30]
 
 class EvaluateModel(models.Model):
     """Evaluating Candidates"""

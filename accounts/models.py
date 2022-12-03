@@ -2,7 +2,7 @@ import datetime
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.html import mark_safe
@@ -165,12 +165,12 @@ class CandidatePost(models.Model):
         verbose_name="Թոկնածու",
     )
     title = models.CharField(max_length=100, verbose_name="Վերնագիր")
-    text = RichTextUploadingField("Տեքստ")
-    media_path = models.URLField(max_length=300, verbose_name="Տեսահոլովակի հղում")
+    text = RichTextUploadingField("Տեքստ", null=True, blank=True)
+    media_path = models.URLField(max_length=300, verbose_name="Տեսահոլովակի հղում", null=True, blank=True)
     photo = models.ImageField(
-        upload_to="media/candidate_post_images/", verbose_name="Նկար", max_length=200
+        upload_to="media/candidate_post_images/", verbose_name="Նկար", max_length=200, null=True, blank=True
     )
-    important = models.BooleanField(default=False, verbose_name="Կարևոր")
+    important = models.BooleanField(default=False, verbose_name="Կարևոր", null=True, blank=True)
 
     class Meta:
         verbose_name = "Թեկնածուների Փոստեր"
@@ -192,13 +192,13 @@ def post_save_user(sender, instance, created, **kwargs):
     :param instance: The User instance that is about to be saved
     :param created: True if a new record is being created
     """
-    if created is False:
-        user = instance.user
-        if instance.is_email_verified is True and instance.is_paid is True:
-            user.is_voter = True
-        else:
-            user.is_voter = False
-        user.save()
+
+    user = instance.user
+    if instance.is_email_verified is True and instance.is_paid is True:
+        user.is_voter = True
+    else:
+        user.is_voter = False
+    user.save()
 
 
 @receiver(post_save, sender=CandidateProfile)
@@ -218,3 +218,16 @@ def pre_save_profile(sender, instance, created, **kwargs) -> None:
         user.is_candidate = False
     user.save()
 
+
+@receiver(post_delete, sender=CandidateProfile)
+def signal_function_name(sender, instance, using, **kwargs):
+    user = instance.user
+    user.is_candidate = False
+    user.save()
+
+
+@receiver(post_delete, sender=VoterProfile)
+def signal_function_name(sender, instance, using, **kwargs):
+    user = instance.user
+    user.is_voter = False
+    user.save()

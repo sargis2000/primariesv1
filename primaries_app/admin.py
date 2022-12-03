@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.utils.html import strip_tags
 
@@ -17,6 +18,12 @@ class VotingAdmin(admin.ModelAdmin):
         "mark",
     )
     search_fields = ("mark",)
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        formfield = super(VotingAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+        if db_field.name == 'content':
+            formfield.widget = forms.Textarea(attrs=formfield.widget.attrs)
+        return formfield
 
 
 @admin.register(EvaluateModel)

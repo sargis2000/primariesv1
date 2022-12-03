@@ -16,7 +16,7 @@ __all__ = [
 class MarkModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarkModel
-        exclude = ("mark",)
+        fields = "__all__"
 
 
 class EvaluateModelSerializer(serializers.ModelSerializer):
@@ -31,11 +31,16 @@ class EvaluateModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "candidate profile not exist or not confirmed"
             )
+
         return attrs
 
     class Meta:
         model = EvaluateModel
         fields = "__all__"
+
+
+
+
 
 
 class NewsSerializer(serializers.ModelSerializer):
