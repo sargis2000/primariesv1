@@ -189,8 +189,10 @@ class SessionView(APIView):
                 candidate_status = "active"
             else:
                 candidate_status = "pending"
+
         return Response(
             {
+                "username": request.user.username,
                 "isAuthenticated": True,
                 "voter_status": voter_status,
                 "candidate_id": candidate_id,
