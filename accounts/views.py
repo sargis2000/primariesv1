@@ -251,8 +251,8 @@ class VoterProfileConfirmMail(APIView):
                 to=[request.user.voterprofile.email],
                 subject="Confirmation mail",
                 message="please click  below link to confirm voter profile. "
-                "If isn't it you, you can easy delete or ignor this mail\n"
-                + create_confirmation_url(
+                        "If isn't it you, you can easy delete or ignor this mail\n"
+                        + create_confirmation_url(
                     request.user, activation_url=settings.VOTER_PROFILE_ACTIVATION_URL
                 ),
             )
@@ -407,9 +407,9 @@ class CandidateProfileConfirmMail(APIView):
                 to=[request.user.candidateprofile.email],
                 subject="Confirmation mail",
                 message="please click  below link to confirm candidate profile "
-                "and wait till admin accept your profile.\n "
-                "If isn't it you, you can easy delete or ignor this mail\n"
-                + create_confirmation_url(
+                        "and wait till admin accept your profile.\n "
+                        "If isn't it you, you can easy delete or ignor this mail\n"
+                        + create_confirmation_url(
                     request.user,
                     activation_url=settings.CANDIDATE_PROFILE_ACTIVATION_URL,
                 ),
@@ -679,9 +679,15 @@ def send_email_view(request):
 
 
 class GetVoterProfiles(APIView):
+    """ This class is a subclass of the APIView class, and it has a get method that returns\
+             a list of all the voter profiles in the database """
+
     def get(self, request, *args, **kwargs):
+        """ A function that gets the request, args, and kwargs.
+
+        :param request: The request object
+        """
+
         voters = VoterProfile.objects.all().filter(user__is_voter=True)
         serializer = VoterProfileSerializer(instance=voters, many=True)
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
