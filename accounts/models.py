@@ -1,4 +1,6 @@
 import datetime
+import uuid
+
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -117,7 +119,7 @@ class CandidateProfile(models.Model):
     is_cleaned = False
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return self.first_name + " " + self.last_name
 
     def get_picture(self):
         return mark_safe(f'<img src={self.picture.url} width="90" height="70"')
@@ -145,7 +147,7 @@ class VoterProfile(models.Model):
     is_email_verified = models.BooleanField(
         default=False, verbose_name="Էլ․ Հասցեն հատատված է"
     )
-    is_paid = models.BooleanField(default=False, verbose_name="ՎՃարել է")
+    is_paid = models.BooleanField(default=False, verbose_name="ՎՃարել է գնահատելու համար")
 
     def __str__(self):
         return self.user.username
@@ -166,11 +168,19 @@ class CandidatePost(models.Model):
     )
     title = models.CharField(max_length=100, verbose_name="Վերնագիր")
     text = RichTextUploadingField("Տեքստ", null=True, blank=True)
-    media_path = models.URLField(max_length=300, verbose_name="Տեսահոլովակի հղում", null=True, blank=True)
-    photo = models.ImageField(
-        upload_to="media/candidate_post_images/", verbose_name="Նկար", max_length=200, null=True, blank=True
+    media_path = models.URLField(
+        max_length=300, verbose_name="Տեսահոլովակի հղում", null=True, blank=True
     )
-    important = models.BooleanField(default=False, verbose_name="Կարևոր", null=True, blank=True)
+    photo = models.ImageField(
+        upload_to="media/candidate_post_images/",
+        verbose_name="Նկար",
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+    important = models.BooleanField(
+        default=False, verbose_name="Կարևոր", null=True, blank=True
+    )
 
     class Meta:
         verbose_name = "Թեկնածուների Փոստեր"
@@ -180,7 +190,9 @@ class CandidatePost(models.Model):
         """
         It returns a string representation of the object.
         """
-        return "Հրապարակում: {0}:  Հեղինակ:{1}".format(self.title, self.profile.user.username)
+        return "Հրապարակում: {0}:  Հեղինակ:{1}".format(
+            self.title, self.profile.user.username
+        )
 
 
 @receiver(post_save, sender=VoterProfile)

@@ -160,15 +160,22 @@ class CandidateProfileAdmin(admin.ModelAdmin):
         :param queryset: The queryset of objects that are selected
         """
 
-        return TemplateResponse(request, "send_mail.html", context={"emails": queryset.values_list("email", flat=True)})
+        return TemplateResponse(
+            request,
+            "send_mail.html",
+            context={"emails": queryset.values_list("email", flat=True)},
+        )
 
     send_mail_action.short_description = "Ուղղարկել նամակ Նշված  թեկնածուներին"
 
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path('send_email_view/', self.admin_site.admin_view(send_email_view, cacheable=True),
-                 name="send_mail_splash"),
+            path(
+                "send_email_view/",
+                self.admin_site.admin_view(send_email_view, cacheable=True),
+                name="send_mail_splash",
+            ),
         ]
         return my_urls + urls
 
@@ -198,10 +205,7 @@ class CandidateProfileAdmin(admin.ModelAdmin):
         "last_name",
         "party",
     )
-    actions = (
-        "send_mail_action",
-        "delete_selected"
-    )
+    actions = ("send_mail_action", "delete_selected")
 
 
 @admin.register(VoterProfile)
@@ -214,17 +218,25 @@ class VoterProfile(admin.ModelAdmin):
         :param queryset: The queryset of objects that are selected
         """
 
-        return TemplateResponse(request, "send_mail.html", context={"emails": queryset.values_list("email", flat=True)})
+        return TemplateResponse(
+            request,
+            "send_mail.html",
+            context={"emails": queryset.values_list("email", flat=True)},
+        )
 
     send_mail_action.short_description = "Ուղղարկել նամակ Նշված  ընտրողներին։"
 
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            path('send_email_view/', self.admin_site.admin_view(send_email_view, cacheable=True),
-                 name="send_mail_splash"),
+            path(
+                "send_email_view/",
+                self.admin_site.admin_view(send_email_view, cacheable=True),
+                name="send_mail_splash",
+            ),
         ]
         return my_urls + urls
+
     @staticmethod
     def full_name(obj):
         return "{0} profile".format(obj.user.username)

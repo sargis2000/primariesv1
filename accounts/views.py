@@ -34,7 +34,7 @@ __all__ = (
     "LogoutAPIView",
     "FacebookLogin",
     "SessionView",
-    "GetVoterProfiles"
+    "GetVoterProfiles",
 )
 
 
@@ -51,7 +51,9 @@ def csrf_failure(request, reason=""):
     )
 
 
-def send_mailgun_mail(form: str, to: list, subject: str | None, message: str) -> Response:
+def send_mailgun_mail(
+    form: str, to: list, subject: str | None, message: str
+) -> Response:
     """It sends an email using the Mailgun API.
 
     :param form: The email address that the email is sent from
@@ -253,8 +255,8 @@ class VoterProfileConfirmMail(APIView):
                 to=[request.user.voterprofile.email],
                 subject="Confirmation mail",
                 message="please click  below link to confirm voter profile. "
-                        "If isn't it you, you can easy delete or ignor this mail\n"
-                        + create_confirmation_url(
+                "If isn't it you, you can easy delete or ignor this mail\n"
+                + create_confirmation_url(
                     request.user, activation_url=settings.VOTER_PROFILE_ACTIVATION_URL
                 ),
             )
@@ -409,9 +411,9 @@ class CandidateProfileConfirmMail(APIView):
                 to=[request.user.candidateprofile.email],
                 subject="Confirmation mail",
                 message="please click  below link to confirm candidate profile "
-                        "and wait till admin accept your profile.\n "
-                        "If isn't it you, you can easy delete or ignor this mail\n"
-                        + create_confirmation_url(
+                "and wait till admin accept your profile.\n "
+                "If isn't it you, you can easy delete or ignor this mail\n"
+                + create_confirmation_url(
                     request.user,
                     activation_url=settings.CANDIDATE_PROFILE_ACTIVATION_URL,
                 ),
@@ -663,7 +665,7 @@ def send_email_view(request):
     if request.method == "POST":
         data = request.POST
         message = data["message"]
-        mails = data.getlist('mails')
+        mails = data.getlist("mails")
         subject = data["subject"]
 
         res = send_mailgun_mail(
@@ -673,11 +675,15 @@ def send_email_view(request):
             message=message,
         )
         if res.status_code == 200:
-            messages.add_message(request, messages.INFO, "էլ․ Հաղորդագրությունները ուղարկված է։")
-            return redirect('admin:index')
+            messages.add_message(
+                request, messages.INFO, "էլ․ Հաղորդագրությունները ուղարկված է։"
+            )
+            return redirect("admin:index")
         else:
-            messages.add_message(request, messages.WARNING, "էլ․ Հաղորդագրությունները չի ուղարկվել։")
-            return redirect('admin:index')
+            messages.add_message(
+                request, messages.WARNING, "էլ․ Հաղորդագրությունները չի ուղարկվել։"
+            )
+            return redirect("admin:index")
 
 
 class GetVoterProfiles(APIView):
@@ -685,7 +691,7 @@ class GetVoterProfiles(APIView):
              a list of all the voter profiles in the database """
 
     def get(self, request, *args, **kwargs):
-        """ A function that gets the request, args, and kwargs.
+        """A function that gets the request, args, and kwargs.
 
         :param request: The request object
         """

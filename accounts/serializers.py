@@ -167,11 +167,11 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(username=attrs["username"])
         except User.DoesNotExist:
-            raise serializers.ValidationError("User does not  Exist")
+            raise serializers.ValidationError("Օգտատերը գոյություն չունի")
         if user.is_active:
             user = authenticate(username=attrs["username"], password=attrs["password"])
             if user is None:
-                raise serializers.ValidationError("Incorrect username or password.")
+                raise serializers.ValidationError("Սխալ մուտքանուն կամ գաղտնաբառ")
         else:
-            raise serializers.ValidationError("access denied")
+            raise serializers.ValidationError("Մուտքը արգելված է")
         return {"user": user}

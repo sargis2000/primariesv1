@@ -53,6 +53,7 @@ urlpatterns = [
         r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
     path("", include("primaries_app.urls")),
+    path("", include("Idram.urls")),
     path("admin/", admin.site.urls),
     path("api-auth/", include("accounts.urls")),
     path("ckeditor/", include("ckeditor_uploader.urls")),

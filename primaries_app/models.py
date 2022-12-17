@@ -23,6 +23,7 @@ class MarkModel(models.Model):
     def __str__(self):
         return self.content[:30]
 
+
 class EvaluateModel(models.Model):
     """Evaluating Candidates"""
 

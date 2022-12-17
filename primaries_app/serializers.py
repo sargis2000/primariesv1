@@ -39,10 +39,6 @@ class EvaluateModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
-
-
-
 class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
