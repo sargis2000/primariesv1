@@ -80,7 +80,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
@@ -92,11 +92,13 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:4040",
     "http://127.0.0.1:8000",
     "http://localhost:4040",
+    "http://localhost:8000",
     "https://api.primaries.am",
     "https://app-primaries.vercel.app",
 ]
 CORS_ALLOWED_ORIGINS = [
     "https://app.primaries.am",
+    "http://localhost:8000",
     "https://primaries-front.herokuapp.com",
     "https://primaries-back.herokuapp.com",
     "http://localhost:4040",

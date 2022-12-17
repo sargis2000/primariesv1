@@ -147,7 +147,9 @@ class VoterProfile(models.Model):
     is_email_verified = models.BooleanField(
         default=False, verbose_name="Էլ․ Հասցեն հատատված է"
     )
-    is_paid = models.BooleanField(default=False, verbose_name="ՎՃարել է գնահատելու համար")
+    is_paid = models.BooleanField(
+        default=False, verbose_name="ՎՃարել է գնահատելու համար"
+    )
 
     def __str__(self):
         return self.user.username

@@ -5,4 +5,4 @@ from .models import PayForEvaluate
 class PayForEvaluateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PayForEvaluate
-        exclude = ("id",)
+        fields = "__all__"
