@@ -2,6 +2,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 
 from accounts.models import CandidateProfile, User, VoterProfile
@@ -85,3 +87,36 @@ class News(models.Model):
     class Meta:
         verbose_name = "Նորություններ"
         verbose_name_plural = "Նորություններ"
+
+
+class GlobalConfigs(models.Model):
+    stage = models.CharField(choices=(('1', 'Գնահատման Փուլ'),
+                                      ('2', 'Առայիջին Քարոզարշավի Փուլ'),
+                                      ('3', 'Առաջին Ընտրության Փուլ'),
+                                      ('4', 'Երկրորդ Քարոզարշավի Փուլ'),
+                                      ('5', 'Երկրորդ Ընտրության Փուլ'),
+                                      (None, 'Ոչ ակտիվ փուլ')
+                                      ), blank=True, null=True, default=None, max_length=1)
+
+    def __str__(self):
+        return 'Կարգավորումներ'
+
+    class Meta:
+        verbose_name = 'Կարգավորումներ'
+        verbose_name_plural = 'Կարգավորումներ'
+
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(GlobalConfigs, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+@receiver(post_save, sender=GlobalConfigs)
+def post_save(sender, instance, created, **kwargs) -> None:

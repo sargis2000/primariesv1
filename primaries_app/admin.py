@@ -2,7 +2,16 @@ from django import forms
 from django.contrib import admin
 from django.utils.html import strip_tags
 
-from .models import EvaluateModel, MarkModel, News
+from .models import EvaluateModel, MarkModel, News, GlobalConfigs
+
+
+@admin.register(GlobalConfigs)
+class VotingAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(MarkModel)
