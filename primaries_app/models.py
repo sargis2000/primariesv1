@@ -2,7 +2,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 
@@ -118,5 +118,16 @@ class GlobalConfigs(models.Model):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
 
-@receiver(post_save, sender=GlobalConfigs)
-def post_save(sender, instance, created, **kwargs) -> None:
+
+@receiver(pre_save, sender=GlobalConfigs)
+def pre_save(sender, instance, **kwargs) -> None:
+    set_unpaid = ['1', '3', '5']
+
+    if instance.stage in set_unpaid and GlobalConfigs.objects.get(id=1).stage != instance.stage:
+        VoterProfile.objects.all().update(is_paid=False, votes_count=None)
+    if instance.stage is None:
+        User.objects.all().update(is_active=False)
+    else:
+        User.objects.all().update(is_active=True)
+
+

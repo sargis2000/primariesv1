@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import IdramPayForEvaluate
+from .views import PayForEvaluate, PayForVoting
+
 
 urlpatterns = [
     # path("i-pay/", )
-    path("get_idram_data/", IdramPayForEvaluate.as_view())
+    path("pay_evaluate/", PayForEvaluate.as_view()),
+    path("pay_voting/", PayForVoting.as_view())
 ]

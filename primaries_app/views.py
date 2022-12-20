@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,6 +20,7 @@ __all__ = [
     "GetCandidateProfiles",
     "GetCandidateByID",
     "SendMailAPIVIEW",
+    "GetEvaluateResult",
 ]
 
 
@@ -215,3 +217,23 @@ class SendMailAPIVIEW(APIView):
             if res.status_code != 200:
                 return Response(f"email not sent.", status=status.HTTP_400_BAD_REQUEST)
             return Response(f"email sent successful", status=status.HTTP_200_OK)
+
+
+class GetEvaluateResult(APIView):
+    def get(self, request):
+        candidate_id = request.query_params.get("candidate", None)
+        if candidate_id:
+            try:
+                candidate_profile = CandidateProfile.objects.get(id=candidate_id)
+            except CandidateProfile.DoesNotExist:
+                return Response("Նշված ID-ով Թեկնածու գոյություն չունի", status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if not candidate_profile.user.is_candidate:
+                    return Response("Նշված ID-ով Թեկնածուն հասանելի չէ", status=status.HTTP_400_BAD_REQUEST)
+                queryset = EvaluateModel.objects.filter(candidate=candidate_profile)
+                res  = sum([i.poll.mark for i in queryset])
+                return Response({"points": res})
+
+        else:
+            res = EvaluateModel.objects.values('candidate').order_by('candidate').annotate(points=Sum('poll__mark'))
+            return Response(res, status.HTTP_200_OK)

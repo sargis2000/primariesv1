@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import PayForEvaluate
+from .models import Pay
 
 
-class PayForEvaluateSerializer(serializers.ModelSerializer):
+class PaySerializer(serializers.ModelSerializer):
     class Meta:
-        model = PayForEvaluate
+        model = Pay
         fields = "__all__"

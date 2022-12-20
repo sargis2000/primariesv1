@@ -1,16 +1,15 @@
 from django.contrib import admin
-from .models import PayForEvaluate
+from .models import Pay
 
 # Register your models here.
 
 
-@admin.register(PayForEvaluate)
+@admin.register(Pay)
 class PayAdmin(admin.ModelAdmin):
     readonly_fields = (
         "EDP_BILL_NO",
         "EDP_AMOUNT",
         "EDP_REC_ACCOUNT",
-        "for_what",
         "confirmed",
         "profile",
     )

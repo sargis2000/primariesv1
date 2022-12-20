@@ -7,7 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.template.response import TemplateResponse
+from primaries_app.models import GlobalConfigs
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import authentication, permissions, status
@@ -199,6 +199,7 @@ class SessionView(APIView):
                 "voter_status": voter_status,
                 "candidate_id": candidate_id,
                 "candidate_status": candidate_status,
+                "stage": GlobalConfigs.objects.get(id=1).stage
             }
         )
 

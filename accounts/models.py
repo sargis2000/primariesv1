@@ -148,8 +148,9 @@ class VoterProfile(models.Model):
         default=False, verbose_name="Էլ․ Հասցեն հատատված է"
     )
     is_paid = models.BooleanField(
-        default=False, verbose_name="ՎՃարել է գնահատելու համար"
+        default=False, verbose_name="ՎՃարել է "
     )
+    votes_count = models.IntegerField(default=None, null=True, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -234,14 +235,14 @@ def pre_save_profile(sender, instance, created, **kwargs) -> None:
 
 
 @receiver(post_delete, sender=CandidateProfile)
-def signal_function_name(sender, instance, using, **kwargs):
+def set_false_candidate(sender, instance, using, **kwargs):
     user = instance.user
     user.is_candidate = False
     user.save()
 
 
 @receiver(post_delete, sender=VoterProfile)
-def signal_function_name(sender, instance, using, **kwargs):
+def set_false_voter(sender, instance, using, **kwargs):
     user = instance.user
     user.is_voter = False
     user.save()
