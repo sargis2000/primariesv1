@@ -1,7 +1,9 @@
 from django.apps import AppConfig
 
+
 def create_config(sender, **kwargs):
     from .models import GlobalConfigs
+
     GlobalConfigs.objects.get_or_create(id=1)
 
 

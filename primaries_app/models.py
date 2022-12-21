@@ -90,21 +90,27 @@ class News(models.Model):
 
 
 class GlobalConfigs(models.Model):
-    stage = models.CharField(choices=(('1', 'Գնահատման Փուլ'),
-                                      ('2', 'Առայիջին Քարոզարշավի Փուլ'),
-                                      ('3', 'Առաջին Ընտրության Փուլ'),
-                                      ('4', 'Երկրորդ Քարոզարշավի Փուլ'),
-                                      ('5', 'Երկրորդ Ընտրության Փուլ'),
-                                      (None, 'Ոչ ակտիվ փուլ')
-                                      ), blank=True, null=True, default=None, max_length=1)
+    stage = models.CharField(
+        choices=(
+            ("1", "Գնահատման Փուլ"),
+            ("2", "Առայիջին Քարոզարշավի Փուլ"),
+            ("3", "Առաջին Ընտրության Փուլ"),
+            ("4", "Երկրորդ Քարոզարշավի Փուլ"),
+            ("5", "Երկրորդ Ընտրության Փուլ"),
+            (None, "Ոչ ակտիվ փուլ"),
+        ),
+        blank=True,
+        null=True,
+        default=None,
+        max_length=1,
+    )
 
     def __str__(self):
-        return 'Կարգավորումներ'
+        return "Կարգավորումներ"
 
     class Meta:
-        verbose_name = 'Կարգավորումներ'
-        verbose_name_plural = 'Կարգավորումներ'
-
+        verbose_name = "Կարգավորումներ"
+        verbose_name_plural = "Կարգավորումներ"
 
     def save(self, *args, **kwargs):
         self.pk = 1
@@ -121,13 +127,23 @@ class GlobalConfigs(models.Model):
 
 @receiver(pre_save, sender=GlobalConfigs)
 def pre_save(sender, instance, **kwargs) -> None:
-    set_unpaid = ['1', '3', '5']
+    set_unpaid = ["1", "3", "5"]
 
-    if instance.stage in set_unpaid and GlobalConfigs.objects.get(id=1).stage != instance.stage:
+    if (
+        instance.stage in set_unpaid
+        and GlobalConfigs.objects.get(id=1).stage != instance.stage
+    ):
         VoterProfile.objects.all().update(is_paid=False, votes_count=None)
     if instance.stage is None:
         User.objects.all().update(is_active=False)
     else:
         User.objects.all().update(is_active=True)
+
+
+class VotingModel(models.Model):
+    voter = models.ForeignKey(VoterProfile, on_delete=models.CASCADE)
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE)
+    position = models.IntegerField()
+    stage = models.IntegerField(default=None)
 
 

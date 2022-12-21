@@ -18,6 +18,7 @@ from rest_framework import permissions, status
 
 values = {1: 2000, 2: 5000, 3: 10000, 4: 20000, 5: 50000}
 
+
 class PayForEvaluate(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -54,12 +55,9 @@ class PayForVoting(APIView):
         else:
             if voter_profile.is_paid:
                 return Response(
-                        "Օգտատերը արդեն վճարել է Քվեառկության համար ",
-                        status.HTTP_400_BAD_REQUEST,
+                    "Օգտատերը արդեն վճարել է Քվեառկության համար ",
+                    status.HTTP_400_BAD_REQUEST,
                 )
             data = Pay.objects.get_or_create(profile=voter_profile, EDP_AMOUNT=count)
             serializer = PaySerializer(data[0])
             return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-

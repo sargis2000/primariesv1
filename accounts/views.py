@@ -199,7 +199,7 @@ class SessionView(APIView):
                 "voter_status": voter_status,
                 "candidate_id": candidate_id,
                 "candidate_status": candidate_status,
-                "stage": GlobalConfigs.objects.get(id=1).stage
+                "stage": GlobalConfigs.objects.get(id=1).stage,
             }
         )
 

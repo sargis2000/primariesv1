@@ -1,14 +1,16 @@
+
+from django.db import IntegrityError
 from django.db.models import Sum
 from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import EvaluateModel
+from .models import EvaluateModel, GlobalConfigs
 from accounts.models import CandidatePost, CandidateProfile, VoterProfile
 from accounts.serializers import CandidatePostSerializer, CandidateProfileSerializer
 from accounts.utils import CandidatePermission, VoterPermission
 from accounts.views import send_mailgun_mail
-from .models import MarkModel, News
+from .models import MarkModel, News, VotingModel
 from .serializers import *
 from django.conf import settings
 from rest_framework.serializers import ValidationError
@@ -21,7 +23,23 @@ __all__ = [
     "GetCandidateByID",
     "SendMailAPIVIEW",
     "GetEvaluateResult",
+    "VoteView",
 ]
+
+def has_dublicates(votes: list) -> bool:
+
+    for i in votes:
+        if votes.count(i) > 1:
+            return True
+    return False
+
+
+def valid_ids(votes: list) -> bool:
+    candidate_ids = [str(i.id) for i in CandidateProfile.objects.all()]
+    for id in votes:
+        if id not in candidate_ids:
+            return False
+    return True
 
 
 class MarkCandidateAPIView(APIView):
@@ -226,14 +244,64 @@ class GetEvaluateResult(APIView):
             try:
                 candidate_profile = CandidateProfile.objects.get(id=candidate_id)
             except CandidateProfile.DoesNotExist:
-                return Response("Նշված ID-ով Թեկնածու գոյություն չունի", status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    "Նշված ID-ով Թեկնածու գոյություն չունի",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             else:
                 if not candidate_profile.user.is_candidate:
-                    return Response("Նշված ID-ով Թեկնածուն հասանելի չէ", status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        "Նշված ID-ով Թեկնածուն հասանելի չէ",
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
                 queryset = EvaluateModel.objects.filter(candidate=candidate_profile)
-                res  = sum([i.poll.mark for i in queryset])
+                res = sum([i.poll.mark for i in queryset])
                 return Response({"points": res})
 
         else:
-            res = EvaluateModel.objects.values('candidate').order_by('candidate').annotate(points=Sum('poll__mark'))
+            res = (
+                EvaluateModel.objects.values("candidate")
+                .order_by("candidate")
+                .annotate(points=Sum("poll__mark"))
+            )
             return Response(res, status.HTTP_200_OK)
+
+
+class VoteView(APIView):
+    permission_classes = (permissions.IsAuthenticated, VoterPermission)
+
+    def post(self, request):
+
+        votes = request.data.getlist("votes", None)
+        stage = GlobalConfigs.objects.get(id=1).stage
+        try:
+            voter_profile = VoterProfile.objects.get(user=request.user)
+        except VoterProfile.DoesNotExist:
+            return Response("Ընտրողի տվյալների սխալ")
+
+        if votes is None:
+            return Response(
+                "ընտրության տվյալները դատարկ են", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if has_dublicates(votes):
+            return Response("Սխալ քվեաթերթիկ", status=status.HTTP_400_BAD_REQUEST)
+        if not valid_ids(votes):
+            return Response("Թեկնածուների ID-ների Սխալ")
+
+        if VotingModel.objects.filter(voter=voter_profile, stage=stage).exists():
+            return Response("Ընտրողը արդեն քվերկել է", status=status.HTTP_400_BAD_REQUEST)
+
+        for i, j in enumerate(votes, start=1):
+            if i > CandidateProfile.objects.all().count():
+                return Response("Ընտրության համարի սԽալ", status=status.HTTP_400_BAD_REQUEST)
+            try:
+                VotingModel.objects.create(
+                    voter=voter_profile,
+                    candidate=CandidateProfile.objects.get(id=j),
+                    position=i,
+                    stage=stage
+                )
+            except CandidateProfile.DoesNotExist:
+                return Response(f"Նշված ID ով թեկնածու գոյություն չունի id={j}", status=status.HTTP_400_BAD_REQUEST)
+        return Response("OK", status.HTTP_200_OK)
